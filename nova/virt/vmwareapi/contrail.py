@@ -48,6 +48,7 @@ from thrift.transport import TTransport, TSocket
 from thrift.transport.TTransport import TTransportException
 from thrift.protocol import TBinaryProtocol, TProtocol
 from contrail_vrouter_api.vrouter_api import ContrailVRouterApi
+from thrift.Thrift import TApplicationException
 
 LOG = logging.getLogger(__name__)
 
@@ -64,7 +65,7 @@ class ContrailVIFDriver(object):
     PORT_TYPE = 'NovaVMPort'
 
     def __init__(self):
-        super(ContrailVIFDriver, self).__init__(get_connection)
+        super(ContrailVIFDriver, self).__init__()
         self._vrouter_client = ContrailVRouterApi()
         timer = loopingcall.FixedIntervalLoopingCall(self._keep_alive)
         timer.start(interval=2)
@@ -100,7 +101,7 @@ class ContrailVIFDriver(object):
         try:
             result = self._vrouter_client.add_port(instance['uuid'],
                                                    vif['id'],
-                                                   dev,
+                                                   network['bridge'],
                                                    vif['address'],
                                                    **kwargs)
             if not result:
